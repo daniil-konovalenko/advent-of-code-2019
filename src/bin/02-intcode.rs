@@ -3,11 +3,30 @@ use std::str::FromStr;
 
 fn main() {
     let mut program = read_intcode("inputs/02-intcode.txt");
-    program[1] = 12;
-    program[2] = 2;
+    let answer = brute_force(&mut program, 19690720);
+    dbg!(answer);
+}
+
+fn brute_force(program: &mut Vec<usize>, expected: usize) -> usize {
+    for verb in 0..program.len() {
+        for noun in 0..program.len() {
+            if run_program(program, noun, verb) == expected {
+                return 100 * noun + verb;
+            }
+        }
+    }
+    return 0;
+}
+
+fn run_program(initial_program: &Vec<usize>, noun: usize, verb: usize) -> usize {
+    let mut program = initial_program.to_vec();
+
+    program[1] = noun;
+    program[2] = verb;
 
     interpret(&mut program);
-    dbg!(program[0]);
+
+    program[0]
 }
 
 fn get_op(opcode: usize) -> fn(usize, usize) -> usize {
